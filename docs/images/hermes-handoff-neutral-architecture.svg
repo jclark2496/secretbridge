@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1050" viewBox="0 0 1800 1050" role="img" aria-labelledby="title desc">
+  <title id="title">Hermes Handoff provider-neutral architecture</title>
+  <desc id="desc">Chat contains only metadata. The browser encrypts with WebCrypto, sends ciphertext over private Tailscale Serve HTTPS to a Mac-local collector, the Mac decrypts locally and passes the value to an operator adapter for a chosen external secret store. Mac Keychain protects encrypted request private keys stored in SQLite. Activation is separate.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#07111f"/><stop offset="0.65" stop-color="#0f172a"/><stop offset="1" stop-color="#111827"/></linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#203047" stroke-width="1" opacity=".42"/></pattern>
+    <marker id="arrowCyan" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#38bdf8"/></marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#34d399"/></marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#fbbf24"/></marker>
+    <style><![CDATA[
+      .bg{fill:url(#bg)} .grid{fill:url(#grid)}
+      text{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      .title{font-weight:850;font-size:50px;letter-spacing:-1.6px;fill:#f8fafc}.subtitle{font-weight:600;font-size:23px;fill:#cbd5e1}.eyebrow{font:800 15px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:1.8px;fill:#93c5fd;text-transform:uppercase}
+      .lane{fill:none;stroke:#64748b;stroke-width:2.2;stroke-dasharray:10 9;rx:28}.laneLabel{font:800 17px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:1.2px;fill:#cbd5e1}
+      .box{stroke-width:2.4;rx:22}.chat{fill:#172033;stroke:#64748b}.browser{fill:#083344;stroke:#22d3ee}.network{fill:#2a1e10;stroke:#f59e0b}.mac{fill:#063a35;stroke:#34d399}.store{fill:#24183f;stroke:#a78bfa}.external{fill:#1f2937;stroke:#94a3b8}.key{fill:#3c1225;stroke:#fb7185}.receipt{fill:#10223a;stroke:#60a5fa}.activate{fill:#2f260d;stroke:#fbbf24}.note{fill:#020617;stroke:#334155;stroke-width:1.8;rx:18}
+      .h{font-weight:820;font-size:25px;fill:#f8fafc}.body{font-weight:560;font-size:17px;fill:#dbeafe}.body2{font-weight:560;font-size:16px;fill:#cbd5e1}.small{font:700 13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#94a3b8}.smallBright{font:800 13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#e2e8f0}
+      .flow{fill:none;stroke:#38bdf8;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowCyan)}.flowGreen{fill:none;stroke:#34d399;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowGreen)}.flowAmber{fill:none;stroke:#fbbf24;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowAmber)}.dashed{stroke-dasharray:10 9}.noValue{fill:#fecaca;stroke:#fb7185;stroke-width:2}.pill{fill:#0f172a;stroke:#334155;stroke-width:1.4;rx:16}.num{fill:#020617;font-weight:900;font-size:15px}.numBg{fill:#e0f2fe}
+    ]]></style>
+  </defs>
+  <rect class="bg" width="1800" height="1050"/><rect class="grid" width="1800" height="1050"/>
+  <text class="eyebrow" x="80" y="70">Provider-neutral final media · dummy-only capture</text>
+  <text class="title" x="80" y="126">Hermes Handoff</text>
+  <text class="subtitle" x="80" y="166">Secret values bypass chat; only request metadata and receipts are visible to the agent.</text>
+
+  <rect class="lane" x="60" y="215" width="520" height="550"/>
+  <text class="laneLabel" x="88" y="248">AGENT / CHAT SURFACE</text>
+  <rect class="lane" x="640" y="215" width="370" height="550"/>
+  <text class="laneLabel" x="668" y="248">USER BROWSER</text>
+  <rect class="lane" x="1070" y="215" width="465" height="550"/>
+  <text class="laneLabel" x="1098" y="248">MAC-LOCAL BOUNDARY</text>
+  <rect class="lane" x="1585" y="215" width="155" height="550"/>
+  <text class="laneLabel" x="1610" y="248">EXTERNAL</text>
+
+  <path class="flow" d="M420 380 C500 380 560 380 650 380"/>
+  <path class="flow" d="M925 380 C1000 380 1010 380 1090 380"/>
+  <path class="flowGreen" d="M1398 380 C1480 380 1515 380 1600 380"/>
+  <path class="flowGreen dashed" d="M1595 505 C1490 550 1390 565 1312 530"/>
+  <path class="flowAmber dashed" d="M1288 598 C1280 670 1280 686 1280 742"/>
+  <path class="flowAmber dashed" d="M1290 598 C1370 662 1435 705 1492 742"/>
+  <path class="flow dashed" d="M422 580 C530 650 735 705 1095 705"/>
+
+  <g transform="translate(100 300)">
+    <rect class="box chat" width="320" height="160"/>
+    <circle class="numBg" cx="34" cy="36" r="17"/><text class="num" x="29" y="42">1</text>
+    <text class="h" x="62" y="43">Chat metadata</text>
+    <text class="body" x="28" y="84">requestURL issued to user</text>
+    <text class="body" x="28" y="112">validated receipt returned later</text>
+    <rect class="noValue" x="28" y="130" width="262" height="36" rx="16" opacity=".16"/><text class="smallBright" x="47" y="153">no secret value in chat</text>
+  </g>
+
+  <g transform="translate(674 300)">
+    <rect class="box browser" width="255" height="160"/>
+    <circle class="numBg" cx="34" cy="36" r="17"/><text class="num" x="29" y="42">2</text>
+    <text class="h" x="62" y="43">Browser</text>
+    <text class="body" x="28" y="84">WebCrypto encrypts</text>
+    <text class="body" x="28" y="112">before submit</text>
+    <text class="small" x="28" y="146">RSA-OAEP + AES-GCM</text>
+  </g>
+
+  <g transform="translate(1095 300)">
+    <rect class="box mac" width="303" height="160"/>
+    <circle class="numBg" cx="34" cy="36" r="17"/><text class="num" x="29" y="42">3</text>
+    <text class="h" x="62" y="43">Mac collector</text>
+    <text class="body" x="28" y="84">Private HTTPS via Tailscale Serve</text>
+    <text class="body" x="28" y="112">loopback Python decrypts locally</text>
+    <text class="small" x="28" y="146">Host / Origin / CSRF / identity</text>
+  </g>
+
+  <g transform="translate(1605 300)">
+    <rect class="box external" width="110" height="160"/>
+    <text class="h" x="22" y="42">Chosen</text>
+    <text class="h" x="22" y="70">secret</text>
+    <text class="h" x="22" y="98">store</text>
+    <text class="small" x="18" y="136">operator</text><text class="small" x="18" y="154">selected</text>
+  </g>
+
+  <g transform="translate(1095 505)">
+    <rect class="box store" width="217" height="145"/>
+    <text class="h" x="26" y="42">SQLite</text>
+    <text class="body2" x="26" y="78">encrypted request</text>
+    <text class="body2" x="26" y="103">private key</text>
+    <text class="small" x="26" y="132">receipt metadata only</text>
+  </g>
+  <g transform="translate(1330 505)">
+    <rect class="box key" width="165" height="145"/>
+    <text class="h" x="24" y="42">Mac</text><text class="h" x="24" y="70">Keychain</text>
+    <text class="body2" x="24" y="107">protects</text><text class="small" x="24" y="132">wrapping key</text>
+  </g>
+
+  <g transform="translate(100 535)">
+    <rect class="box receipt" width="322" height="145"/>
+    <text class="h" x="26" y="42">Receipt semantics</text>
+    <text class="body2" x="26" y="78">durable storage is confirmed only</text>
+    <text class="body2" x="26" y="103">by a validated durable receipt</text>
+    <text class="small" x="26" y="132">demo screenshot uses ephemeral sink</text>
+  </g>
+
+  <g transform="translate(1130 735)">
+    <rect class="box activate" width="365" height="105"/>
+    <text class="h" x="26" y="42">Activation is separate</text>
+    <text class="body2" x="26" y="75">storing/receipting does not enable or sync a credential</text>
+  </g>
+
+  <g transform="translate(96 830)">
+    <rect class="note" width="870" height="120"/>
+    <text class="h" x="28" y="43">Media evidence boundaries</text>
+    <text class="body2" x="28" y="78">Screenshots are from a temporary 127.0.0.1 loopback server using EphemeralDemoSink.</text>
+    <text class="body2" x="28" y="104">They demonstrate form behavior and receipt rendering only; no real credentials, provider tokens, Keychain state, or external storage were used.</text>
+  </g>
+  <g transform="translate(1020 850)">
+    <rect class="pill" width="690" height="92"/>
+    <text class="smallBright" x="24" y="34">No supported-vendor claims:</text>
+    <text class="smallBright" x="24" y="60">the adapter points to whichever external</text>
+    <text class="smallBright" x="24" y="82">secret store the operator chooses.</text>
+  </g>
+</svg>

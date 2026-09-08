@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hermes.hermes-handoff</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/example/Projects/Hermes Handoff/.venv-secure/bin/python</string>
+    <string>-m</string>
+    <string>secure_storage.production</string>
+    <string>serve</string>
+    <string>--state</string>
+    <string>/Users/example/.hermes/hermes-handoff/secure-handoff.sqlite3</string>
+    <string>--host</string>
+    <string>127.0.0.1</string>
+    <string>--port</string>
+    <string>9127</string>
+    <string>--external-origin</string>
+    <string>https://handoff-mac.example-tailnet.ts.net:9443</string>
+    <string>--allowed-origin</string>
+    <string>https://handoff-mac.example-tailnet.ts.net:9443</string>
+    <string>--tailscale-user-login</string>
+    <string>REPLACE_WITH_EXACT_TAILSCALE_USER_LOGIN</string>
+    <string>--sink</string>
+    <string>your_package.your_sink:YourDurableSink</string>
+    <string>--log</string>
+    <string>/Users/example/.hermes/hermes-handoff/secure-handoff.log</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/example/Projects/Hermes Handoff</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <!-- Provider tokens are intentionally not embedded or inherited. Configure credentials inside the operator-owned durable sink adapter or its private configuration. -->
+  </dict>
+
+  <key>RunAtLoad</key>
+  <false/>
+  <key>KeepAlive</key>
+  <false/>
+  <key>StandardOutPath</key>
+  <string>/Users/example/.hermes/hermes-handoff/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/example/.hermes/hermes-handoff/launchd.err.log</string>
+</dict>
+</plist>

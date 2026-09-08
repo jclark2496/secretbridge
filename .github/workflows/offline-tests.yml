@@ -1,0 +1,32 @@
+name: offline-tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install provider-free test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Run offline tests
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -m unittest discover -v
+      - name: Run provider-free synthetic browser demo
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python -m secure_storage.run_browser_canary \
+            --protected-test-memory \
+            --evidence-dir "$RUNNER_TEMP/hermes-handoff-demo"
