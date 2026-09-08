@@ -1,8 +1,16 @@
-# Hermes Handoff
+# SecretBridge
 
-**Give your agent the credential — not your chat history.**
+**Secrets to your agent. Not into your chat.**
 
-Hermes Handoff is an independent community prototype for short-lived, browser-assisted credential handoff to a local Mac operator process. It demonstrates a safer pattern for collecting a secret into an approved local secret sink without pasting that secret into an AI chat transcript.
+SecretBridge is a secure credential-entry layer for agent frameworks. Give your agent the secrets it needs through a dedicated form, keep their values out of the conversation, and connect storage through an explicit adapter.
+
+## Why I built this
+
+After seeing credential-entry experiences in Grok Bot and Instinct, I wanted a similar interaction in my own Hermes workflow: when an agent needs a key, give me a dedicated place to enter it instead of asking me to paste it into the conversation.
+
+SecretBridge explores that pattern as a provider-neutral reference implementation, separating credential entry, storage confirmation, and later activation. Those experiences inspired the interaction—not a claim that this project uses their internal architecture or provides equivalent security.
+
+Originally published as Hermes Handoff. Existing repository URLs, module names, and deployment identifiers are retained for compatibility; this branding change does not require changes to an existing installation. Screenshots show the earlier demo branding.
 
 This repository is not an official Nous Research or Hermes Agent product, and it is not endorsed, maintained, or supported by Nous Research.
 
