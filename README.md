@@ -10,7 +10,7 @@ After seeing credential-entry experiences in Grok Bot and Instinct, I wanted a s
 
 SecretBridge explores that pattern as a provider-neutral reference implementation, separating credential entry, storage confirmation, and later activation. Those experiences inspired the interaction—not a claim that this project uses their internal architecture or provides equivalent security.
 
-Originally published as Hermes Handoff. Existing repository URLs, module names, and deployment identifiers are retained for compatibility; this branding change does not require changes to an existing installation. Screenshots show the earlier demo branding.
+Originally published as Hermes Handoff. The repository is now `jclark2496/secretbridge`; module names and deployment identifiers are retained for compatibility; this branding change does not require changes to an existing installation. Screenshots show the earlier demo branding.
 
 This repository is not an official Nous Research or Hermes Agent product, and it is not endorsed, maintained, or supported by Nous Research.
 
@@ -56,7 +56,7 @@ The browser receives a short-lived one-use handoff URL. Browser JavaScript encry
 Requires Python 3.12+ and no private Hermes source tree.
 
 ```bash
-cd hermes-credential-handoff
+cd secretbridge
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
