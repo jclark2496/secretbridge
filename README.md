@@ -21,8 +21,10 @@ The demo uses a generated sample value and an in-memory destination.
   whitespace and preserves it when the visitor confirms. WebCrypto encrypts
   the submission before it goes to the loopback collector.
 - **Check the result.** The submitter sees a receipt without the value. The
-  operator can use the `status` command to see whether the request is pending,
-  expired, or stored, along with its destination and receipt ID when available.
+  operator can use the [operator helper](secure_storage/operator_helper.py)
+  `status` command to see whether the request is pending, expired, stored,
+  or fulfilled by the ephemeral demo sink. The receipt includes the destination
+  and, after successful storage, the adapter’s storage ID.
 - **Choose storage.** The Mac entrypoint protects request keys with macOS
   Keychain. To store real credentials, supply your own durable storage adapter.
   The included browser demo exercises the whole submission with an in-memory
@@ -50,8 +52,9 @@ python -m secure_storage.run_browser_canary \
 
 Chromium opens the form headlessly and submits a generated sample. Look for
 `"ok": true` and `"mode": "ephemeral-demo"` in the terminal. Open the JSON
-file named by `receipt_path` to see the destination and the explicit
-`"storage_durable": false` flag in the local receipt. Add `--headful` to the
+file named by `receipt_path` to see the destination and the
+`"storage_durable": false` flag under `local_receipt`. The adjacent
+`log_path` points to the run log in the same evidence directory. Add `--headful` to the
 canary command to watch the browser. The demo uses temporary SQLite state and
 an in-memory wrapping key.
 
