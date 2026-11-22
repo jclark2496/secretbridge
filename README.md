@@ -1,31 +1,86 @@
 # SecretBridge
 
-**Secrets to your agent. Not into your chat.**
+Give your agent a credential through a one-use browser form and keep its value
+out of the chat. SecretBridge lets the operator choose where the value goes
+and gives the person who submitted it a receipt.
 
-SecretBridge is a secure credential-entry layer for agent frameworks. Give your agent the secrets it needs through a dedicated form, keep their values out of the conversation, and connect storage through an explicit adapter.
+[Run the local browser demo](#quickstart) · [Review the security limitations](#security-limitations)
+
+<img src="https://forkthis.ai/assets/shots/secretbridge.jpg" width="700" alt="SecretBridge's empty credential form with a destination selected">
+
+The demo uses a generated sample value and an in-memory destination.
+
+<a id="what-is-included"></a>
+
+## What it can do
+
+- **Issue a request.** The local operator picks a destination and an expiry,
+  then shares a one-use handoff URL. The form shows the destination before the
+  visitor enters anything.
+- **Collect the value as typed.** The browser warns about leading or trailing
+  whitespace and preserves it when the visitor confirms. WebCrypto encrypts
+  the submission before it goes to the loopback collector.
+- **Check the result.** The submitter sees a receipt without the value. The
+  operator can use the [operator helper](secure_storage/operator_helper.py)
+  `status` command to see whether the request is pending, expired, stored,
+  or fulfilled by the ephemeral demo sink. The receipt includes the destination
+  and, after successful storage, the adapter’s storage ID.
+- **Choose storage.** The Mac entrypoint protects request keys with macOS
+  Keychain. To store real credentials, supply your own durable storage adapter.
+  The included browser demo exercises the whole submission with an in-memory
+  adapter and a generated sample value.
+
+<a id="quickstart-clean-standalone-install"></a>
+
+## Quickstart
+
+Use Git and Python 3.12 or newer. The demo runs locally with Chromium and
+needs no Hermes installation, provider account, or Keychain entry.
+
+```bash
+git clone https://github.com/jclark2496/secretbridge.git
+cd secretbridge
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m playwright install chromium
+python -m secure_storage.run_browser_canary \
+  --protected-test-memory \
+  --evidence-dir /tmp/hermes-handoff-demo
+```
+
+Chromium opens the form headlessly and submits a generated sample. Look for
+`"ok": true` and `"mode": "ephemeral-demo"` in the terminal. Open the JSON
+file named by `receipt_path` to see the destination and the
+`"storage_durable": false` flag under `local_receipt`. The adjacent
+`log_path` points to the run log in the same evidence directory. Add `--headful` to the
+canary command to watch the browser. The demo uses temporary SQLite state and
+an in-memory wrapping key.
 
 ## Why I built this
 
-After seeing credential-entry experiences in Grok Bot and Instinct, I wanted a similar interaction in my own Hermes workflow: when an agent needs a key, give me a dedicated place to enter it instead of asking me to paste it into the conversation.
+After seeing credential-entry experiences in Grok Bot and Instinct, I wanted a
+similar interaction in my own Hermes workflow. When an agent needs a key, I
+want a dedicated place to enter it.
 
-SecretBridge explores that pattern as a provider-neutral reference implementation, separating credential entry, storage confirmation, and later activation. Those experiences inspired the interaction—not a claim that this project uses their internal architecture or provides equivalent security.
-
-Originally published as Hermes Handoff. The repository is now `jclark2496/secretbridge`; module names and deployment identifiers are retained for compatibility; this branding change does not require changes to an existing installation. Screenshots show the earlier demo branding.
-
-This repository is not an official Nous Research or Hermes Agent product, and it is not endorsed, maintained, or supported by Nous Research.
+SecretBridge explores that interaction as a provider-neutral reference
+implementation. Entering a value and confirming storage are separate from
+activating the credential later. The inspiration was the interaction itself.
+The underlying architecture and security guarantees of those products are
+their own.
 
 ## Public release status
 
-This code is prepared as a standalone runnable repo with a provider-neutral core. The public candidate does not include a built-in durable secret-provider integration. Durable storage is supplied by the operator through an explicit `--sink module:Class` adapter; the included browser canary uses an ephemeral in-memory demo sink only.
+The public package ships with the ephemeral demo sink. A real provider
+integration is operator-supplied through `--sink module:Class`. The existing
+module names and deployment identifiers are retained for compatibility with
+Hermes Handoff installations.
 
-Do not treat the proposed MIT license for original code as clearance for Tailscale, Hermes Agent, operator-supplied sink adapters, or any other third-party dependency.
-
-## What is included
-
-- `secure_storage/`: local Python package for request creation, loopback HTTP collection, request registry/state, browser WebCrypto envelope handling, macOS Keychain key protection, and provider-neutral durable-sink interfaces.
-- Offline unit/integration tests using fake sinks and temporary state only.
-- A synthetic browser demo canary that submits a generated non-secret value through the local encrypted handoff flow.
-- Template-only Mac hosted deployment notes under `deploy/mac-hosted/` using sample hostnames, sample UUIDs, and placeholder operator identity.
+SecretBridge is independent of Nous Research and the Hermes Agent project. It
+has no official endorsement, maintenance, or support from Nous Research. The
+[MIT license](LICENSE) covers the project's original code. Tailscale, Hermes
+Agent, operator-supplied adapters, and other dependencies have their own terms.
 
 ## Security model, briefly
 
@@ -33,15 +88,32 @@ Do not treat the proposed MIT license for original code as clearance for Tailsca
 
 ### Actual demo screenshots
 
-These captures use synthetic data and an ephemeral sink, not a real vault.
+These captures use the project's original name, Hermes Handoff.
 
-![Credential entry](docs/images/hermes-handoff-neutral-form.png)
+![The demo form shows its fixed destination](docs/images/hermes-handoff-neutral-form.png)
+
+The browser highlights potentially accidental whitespace before it encrypts the
+value. In the synthetic demo, the confirmation screen identifies the storage
+as ephemeral.
 
 ![Whitespace warning preserves the submitted value](docs/images/hermes-handoff-neutral-whitespace-warning.png)
 
 ![Ephemeral demo receipt — not durable storage](docs/images/hermes-handoff-neutral-ephemeral-receipt.png)
 
-The browser receives a short-lived one-use handoff URL. Browser JavaScript encrypts the submitted value with WebCrypto, wraps the AES key to a Mac-generated RSA public key, and posts only the encrypted envelope. The local Mac collector unwraps/decrypts and passes the plaintext to an injected sink. Durable storage is intentionally operator-supplied via `--sink module:Class`; offline tests and the browser canary use fake or ephemeral sinks only.
+Browser JavaScript encrypts the value with a fresh AES-GCM key, wraps that key
+to the request's RSA public key, and posts the envelope. The local collector
+unwraps it and passes the plaintext to the configured storage adapter.
+
+## One design decision
+
+**The operator fixes the destination before sharing the link.** At submission
+time, the collector loads the destination from the local request record. It
+checks that the adapter's receipt identifies the same request and destination
+and agrees with the adapter's durability setting before marking the request
+used. A successful demo can therefore show its receipt without claiming a
+write to a real vault. The tests include both a browser-supplied destination
+and a mismatched receipt. [Request store](secure_storage/store.py) ·
+[Handoff tests](secure_storage/tests/test_secure_handoff.py)
 
 ## Security limitations
 
@@ -51,50 +123,27 @@ The browser receives a short-lived one-use handoff URL. Browser JavaScript encry
 - Tailscale Serve/private HTTPS examples trust the local identity proxy to supply correct `Tailscale-User-Login` headers.
 - Do not enter real credentials until you have reviewed and adapted the threat model, destination project isolation, service lifecycle, logging, dependency licenses, and recovery behavior for your environment.
 
-## Quickstart: clean standalone install
+## CI
 
-Requires Python 3.12+ and no private Hermes source tree.
-
-```bash
-cd secretbridge
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m playwright install chromium
-```
-
-Run the offline test suite:
+Run the offline unit and integration tests from the activated environment.
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -v
 ```
 
-Run the synthetic browser demo canary (fake sink, generated non-secret value, temp/isolated state):
-
-```bash
-python -m secure_storage.run_browser_canary \
-  --protected-test-memory \
-  --evidence-dir /tmp/hermes-handoff-demo
-```
-
-Expected output is JSON like:
-
-```json
-{"ok": true, "mode": "ephemeral-demo", "receipt_path": "/tmp/hermes-handoff-demo/browser-canary-demo-....json", "log_path": "/tmp/hermes-handoff-demo/browser-canary-demo-....log"}
-```
-
-The demo starts an ephemeral loopback server and a local Chromium browser. Its sink is in-memory and not durable. It does not call a secret provider, read live credentials, or write Keychain.
-
-## CI
-
-GitHub Actions workflow: `.github/workflows/offline-tests.yml`
-
-It installs `requirements.txt`, installs Playwright Chromium, runs the offline unit/integration tests, and runs the provider-free synthetic browser demo. It does not install a secret-provider SDK or require secrets.
+The GitHub Actions workflow installs the requirements and Chromium, runs the
+tests, and runs the synthetic browser demo. All of these use fake or ephemeral
+storage. [CI workflow](.github/workflows/offline-tests.yml)
 
 ## Durable sink configuration
 
-The public core is provider-neutral. To serve real handoffs, the operator must supply a durable sink adapter and pass it explicitly as `--sink module:Class` to `secure_storage.production serve`. The adapter class must be importable in the runtime environment, require no secrets from environment variables in its zero-argument constructor, expose `durable = True`, and implement the `DurableSink.store(destination, value, request_id=...)` contract from `secure_storage.sinks`.
+To connect a storage provider in your fork, pass an importable adapter class as
+`--sink module:Class` to `secure_storage.production serve`. It needs a
+zero-argument constructor that requires no secrets from environment variables,
+`durable = True`, and a `store` method accepting the keyword arguments
+`destination`, `value`, and `request_id`. Use the request ID as an idempotency
+key. Return a structured receipt after the provider has acknowledged durable
+storage of the exact value. [Adapter contract](secure_storage/sinks.py)
 
 Browser clients cannot choose the destination. Request creation binds `--destination-label` locally, with optional `--destination-id` if the operator adapter needs a stable opaque destination identifier.
 
@@ -134,3 +183,9 @@ Checked-in docs/tests use coherent placeholders only:
 - Example destination ID: `11111111-1111-4111-8111-111111111111`
 
 Replace placeholders with private values outside git when deploying.
+
+The Mac-hosted runbook has template settings for private HTTPS and the
+protected collector, plus examples of issuing requests and reading their
+receipts. [Mac-hosted runbook](deploy/mac-hosted/RUNBOOK.md)
+
+[Read the SecretBridge build note on Forkthis](https://forkthis.ai/secretbridge/).
